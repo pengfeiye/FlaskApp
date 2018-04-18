@@ -20,7 +20,12 @@
         <td>{{article.author}}</td>
         <td>{{article.create_date}}</td>
         <th><a href="edit_article/{{article.id}}" class="btn btn-default pullright">Edit</a></th>
-        <th><a href="edit_article/{{article.id}}" class="btn btn-danger pullright">Delete</a></th>
+        <th>
+          <form action="{{url_for('delete_article', id= article.id)}}" method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="Submit" name="" value="Delete" class="btn btn-danger">
+          </form>
+        </th>
       </tr>
     {% endfor %}
   </table>
