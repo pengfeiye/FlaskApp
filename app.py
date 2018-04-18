@@ -39,13 +39,11 @@ def about():
     return render_template('about.html')
 
 @app.route('/articles')
-@is_logged_in
 def articles():
     return render_template('articles.html', articles = Articles)
 
 
 @app.route('/article/<string:id>')
-@is_logged_in
 def article(id):
     return render_template('article.html', id=id)
 
@@ -137,11 +135,43 @@ def dashboard():
     return render_template('dashboard.html')
 
 @app.route('/logout')
+@is_logged_in
 def logout():
     session.clear()
     flash('You have logged out', 'success')
 
     return redirect(url_for('index'))
+
+#Adding and Editing Article form
+class ArticleForm(Form):
+    title=StringField('Title', [validators.Length(min=1,max=200)])
+    body=TextAreaField('Body', [validators.Length(min=30)])
+#Add article
+@app.route('/add_article', methods=["GET", "POST"])
+@is_logged_in
+def add_article():
+    form = ArticleForm(request.form)
+    if request.method == "POST" and form.validate():
+        title = form.title.data
+        body = form.body.data
+
+        #create cursor
+        cur = mysql.connection.cursor()
+
+        cur.execute("INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)",(title, body, session['username']))
+
+        #commit to DB
+
+        mysql.connection.commit()
+
+        #close connection
+        cur.close()
+
+        flash('Article Created', 'success')
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_article.html', form=form)
 
 
 
