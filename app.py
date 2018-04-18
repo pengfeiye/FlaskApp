@@ -132,7 +132,24 @@ def login():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-    return render_template('dashboard.html')
+    #opening DB connection
+    cur = mysql.connection.cursor()
+
+    #get articles
+    result = cur.execute("SELECT * FROM articles")
+
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('dashboard.html', articles=articles)
+    else:
+        msg= 'No Articles Found'
+        return render_template('dashboard.html', msg=msg)
+
+    #closing DB connection
+    cur.close()
+
+
 
 @app.route('/logout')
 @is_logged_in
